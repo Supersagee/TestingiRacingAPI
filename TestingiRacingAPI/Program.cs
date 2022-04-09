@@ -1,5 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Aydsko.iRacingData;
+using Microsoft.Extensions.Configuration;
+using System.Data;
+using MySql.Data.MySqlClient;
+using TestingiRacingAPI;
+using Dapper;
 
 Console.WriteLine("Aydsko iRacing Data API Example Console Application");
 
@@ -9,7 +14,7 @@ var username = Console.ReadLine();
 
 Console.WriteLine();
 Console.Write("iRacing Password: ");
-var password = ReadPassword();
+var password = Console.ReadLine();
 
 if (username is null || password is null)
 {
@@ -30,6 +35,16 @@ using var appScope = provider.CreateScope();
 var iRacingClient = provider.GetRequiredService<IDataClient>();
 var myInfo = await iRacingClient.GetMyInfoAsync();
 
+var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+string connString = config.GetConnectionString("DefaultConnection");
+IDbConnection conn = new MySqlConnection(connString);
+
+//var repo = new DapperResultRepo(conn, iRacingClient);
+
 Console.WriteLine();
 Console.WriteLine("Request successful!");
 Console.WriteLine($@"Driver name: {myInfo.Data.DisplayName}
@@ -37,13 +52,59 @@ Customer ID: {myInfo.Data.CustomerId}
 Joined iRacing on: {myInfo.Data.MemberSince}
 Suit colors are: {myInfo.Data.Suit.Color1}, {myInfo.Data.Suit.Color2}, {myInfo.Data.Suit.Color3}");
 
-var subSessionResults = await iRacingClient.GetSubSessionResultAsync(45243121, false);
+var myId = new int[1] { 564678 };
+//repo.UpdateMyRatings(myId);
+
+var myRatings = await iRacingClient.GetDriverInfoAsync(myId, true);
+var ovalRatings = myRatings.Data[0].Licenses[0];
+var roadRatings = myRatings.Data[0].Licenses[1];
+var dirtOvalRatings = myRatings.Data[0].Licenses[2];
+var dirtRoadRatings = myRatings.Data[0].Licenses[3];
+
+conn.Execute("UPDATE myratings SET ovallicense = @OL, ovalsafetyrating = @OSR, ovalirating = @OIR, roadlicense = @RL, roadsafetyrating = @RSR, roadirating = @RIR, dirtovallicense = @DOL, dirtovalsafetyrating = @DOSR, dirtovalirating = @DOIR, dirtroadlicense = @DRL, dirtroadsafetyrating = @DRSR, dirtroadirating = @DRIR WHERE idMyRatings = 4;",
+    new { OL = ovalRatings.LicenseLevel, OSR = ovalRatings.SafetyRating, OIR = ovalRatings.IRating, RL = roadRatings.LicenseLevel, RSR = roadRatings.SafetyRating, RIR = roadRatings.IRating, DOL = dirtOvalRatings.LicenseLevel, DOSR = dirtOvalRatings.SafetyRating, DOIR = dirtOvalRatings.IRating, DRL = dirtRoadRatings.LicenseLevel, DRSR = dirtRoadRatings.SafetyRating, DRIR = dirtRoadRatings.IRating });
+
+Console.WriteLine(ovalRatings.IRating);
+Console.WriteLine(roadRatings.SafetyRating);
+Console.WriteLine(dirtOvalRatings.SafetyRating);
+Console.WriteLine(dirtRoadRatings.IRating);
+
+var sessionId = 45243121;
+var subSessionResults = await iRacingClient.GetSubSessionResultAsync(sessionId, true);
 
 for (var i = 0; i < subSessionResults.Data.SessionResults[1].Results.Length; i++)
 {
     var results = subSessionResults.Data.SessionResults[1].Results[i];
 
-    Console.WriteLine($"{results.FinishPosition + 1} {results.CarId} {results.Position} {results.DisplayName} {results.LapsLead} {results.AverageLap} {results.BestLapTime} {results.Incidents} {results.Division + 1} {results.NewIRating} {results.NewLicenseLevel}");   
+    conn.Execute("INSERT INTO results (SessionId, CustId, DisplayName, CarNumber, FinishPosition, StartingPosition, LapsLed, BestLapNum, BestLapTime, AverageLap," +
+        " Incidents, Division, ClubShortname, OldLicenseLevel, NewLicenseLevel, OldSafetyRating, NewSafetyRating, OldIRating, NewIRating, CarId)" +
+        " VALUES (@sessionId, @custId, @displayName, @carNumber, @finishPosition, @startingPosition, @lapsLed, @bestLapNum, @bestLapTime," +
+        " @averageLap, @incidents, @division, @clubshortname, @oldLicenseLevel, @newLicenseLevel, @oldSafetyRating, @newSafetyRating, @oldIRating, @newIRating, @carId);",
+        new
+        {
+            sessionId = sessionId,
+            custId = results.CustId,
+            displayName = results.DisplayName,
+            carNumber = results.Livery.CarNumber,
+            finishPosition = results.FinishPosition + 1,
+            startingPosition = results.StartingPosition + 1,
+            lapsLed = results.LapsLead,
+            bestLapNum = results.BestLapNum,
+            bestLapTime = results.BestLapTime,
+            averageLap = results.AverageLap,
+            incidents = results.Incidents,
+            division = results.Division + 1,
+            clubshortname = results.ClubShortname,
+            oldLicenseLevel = results.OldLicenseLevel,
+            newLicenseLevel = results.NewLicenseLevel,
+            oldSafetyRating = results.OldSafetyRating,
+            newSafetyRating = results.NewSafetyRating,
+            oldIRating = results.OldIRating,
+            newIRating = results.NewIRating,
+            carId = results.CarId
+        });
+
+    //Console.WriteLine($"{results.DisplayName} {results.FinishPosition + 1} {results.StartingPosition + 1} {results.LapsLead} {results.BestLapNum} {results.BestLapTime} {results.Incidents} {results.OldLicenseLevel} {results.NewLicenseLevel} {results.OldSafetyRating} {results.NewSafetyRating} {results.OldIRating} {results.NewIRating} {results.CarId}");
 }
 
 
