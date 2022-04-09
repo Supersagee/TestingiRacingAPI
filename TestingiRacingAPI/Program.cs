@@ -83,9 +83,9 @@ for (var i = 0; i < subSessionResults.Data.SessionResults[1].Results.Length; i++
 {
     var results = subSessionResults.Data.SessionResults[1].Results[i];
 
-    conn.Execute("INSERT INTO results (SessionId, CustId, DisplayName, CarNumber, FinishPosition, StartingPosition, LapsLed, BestLapNum, BestLapTime, AverageLap," +
+    conn.Execute("INSERT INTO results (SessionId, CustId, DisplayName, CarNumber, FinishPosition, StartingPosition, FinishInterval, LapsLed, BestLapNum, BestLapTime, AverageLap," +
         " Incidents, Division, ClubShortname, OldLicenseLevel, NewLicenseLevel, OldSafetyRating, NewSafetyRating, OldIRating, NewIRating, CarId)" +
-        " VALUES (@sessionId, @custId, @displayName, @carNumber, @finishPosition, @startingPosition, @lapsLed, @bestLapNum, @bestLapTime," +
+        " VALUES (@sessionId, @custId, @displayName, @carNumber, @finishPosition, @startingPosition, @finishInterval, @lapsLed, @bestLapNum, @bestLapTime," +
         " @averageLap, @incidents, @division, @clubshortname, @oldLicenseLevel, @newLicenseLevel, @oldSafetyRating, @newSafetyRating, @oldIRating, @newIRating, @carId);",
         new
         {
@@ -95,6 +95,7 @@ for (var i = 0; i < subSessionResults.Data.SessionResults[1].Results.Length; i++
             carNumber = results.Livery.CarNumber,
             finishPosition = results.FinishPosition + 1,
             startingPosition = results.StartingPosition + 1,
+            finishInterval = results.Interval,
             lapsLed = results.LapsLead,
             bestLapNum = results.BestLapNum,
             bestLapTime = results.BestLapTime,
