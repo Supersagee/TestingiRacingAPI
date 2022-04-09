@@ -1,6 +1,4 @@
 ﻿using Aydsko.iRacingData;
-using Aydsko.iRacingData.Member;
-using Aydsko.iRacingData.Results;
 using Dapper;
 using System;
 using System.Collections.Generic;
@@ -68,13 +66,23 @@ namespace TestingiRacingAPI
             var dirtOvalRatings = myRatings.Data[0].Licenses[2];
             var dirtRoadRatings = myRatings.Data[0].Licenses[3];
 
-            _connection.Execute("UPDATE myratings SET ovallicense = @OL, ovalsafetyrating = @OSR, ovalirating = @OIR, roadlicense = @RL, roadsafetyrating = @RSR, roadirating = @RIR, dirtovallicense = @DOL, dirtovalsafetyrating = @DOSR, dirtovalirating = @DOIR, dirtroadlicense = @DRL, dirtroadsafetyrating = @DRSR, dirtroadirating = @DRIR WHERE idMyRatings = 4;",
-                new { OL = ovalRatings.LicenseLevel, OSR = ovalRatings.SafetyRating, OIR = ovalRatings.IRating, RL = roadRatings.LicenseLevel, RSR = roadRatings.SafetyRating, RIR = roadRatings.IRating, DOL = dirtOvalRatings.LicenseLevel, DOSR = dirtOvalRatings.SafetyRating, DOIR = dirtOvalRatings.IRating, DRL = dirtRoadRatings.LicenseLevel, DRSR = dirtRoadRatings.SafetyRating, DRIR = dirtRoadRatings.IRating });
-
-            Console.WriteLine(ovalRatings.IRating);
-            Console.WriteLine(roadRatings.SafetyRating);
-            Console.WriteLine(dirtOvalRatings.SafetyRating);
-            Console.WriteLine(dirtRoadRatings.IRating);
+            _connection.Execute("UPDATE myratings SET ovallicense = @OL, ovalsafetyrating = @OSR, ovalirating = @OIR, roadlicense = @RL, roadsafetyrating = @RSR, roadirating = @RIR," +
+                " dirtovallicense = @DOL, dirtovalsafetyrating = @DOSR, dirtovalirating = @DOIR, dirtroadlicense = @DRL, dirtroadsafetyrating = @DRSR, dirtroadirating = @DRIR WHERE idMyRatings = 4;",
+                new
+                {
+                    OL = ovalRatings.LicenseLevel,
+                    OSR = ovalRatings.SafetyRating,
+                    OIR = ovalRatings.IRating,
+                    RL = roadRatings.LicenseLevel,
+                    RSR = roadRatings.SafetyRating,
+                    RIR = roadRatings.IRating,
+                    DOL = dirtOvalRatings.LicenseLevel,
+                    DOSR = dirtOvalRatings.SafetyRating,
+                    DOIR = dirtOvalRatings.IRating,
+                    DRL = dirtRoadRatings.LicenseLevel,
+                    DRSR = dirtRoadRatings.SafetyRating,
+                    DRIR = dirtRoadRatings.IRating
+                });
         }
     }
 }

@@ -61,13 +61,20 @@ var roadRatings = myRatings.Data[0].Licenses[1];
 var dirtOvalRatings = myRatings.Data[0].Licenses[2];
 var dirtRoadRatings = myRatings.Data[0].Licenses[3];
 
-conn.Execute("UPDATE myratings SET ovallicense = @OL, ovalsafetyrating = @OSR, ovalirating = @OIR, roadlicense = @RL, roadsafetyrating = @RSR, roadirating = @RIR, dirtovallicense = @DOL, dirtovalsafetyrating = @DOSR, dirtovalirating = @DOIR, dirtroadlicense = @DRL, dirtroadsafetyrating = @DRSR, dirtroadirating = @DRIR WHERE idMyRatings = 4;",
-    new { OL = ovalRatings.LicenseLevel, OSR = ovalRatings.SafetyRating, OIR = ovalRatings.IRating, RL = roadRatings.LicenseLevel, RSR = roadRatings.SafetyRating, RIR = roadRatings.IRating, DOL = dirtOvalRatings.LicenseLevel, DOSR = dirtOvalRatings.SafetyRating, DOIR = dirtOvalRatings.IRating, DRL = dirtRoadRatings.LicenseLevel, DRSR = dirtRoadRatings.SafetyRating, DRIR = dirtRoadRatings.IRating });
-
-Console.WriteLine(ovalRatings.IRating);
-Console.WriteLine(roadRatings.SafetyRating);
-Console.WriteLine(dirtOvalRatings.SafetyRating);
-Console.WriteLine(dirtRoadRatings.IRating);
+conn.Execute("UPDATE myratings SET ovallicense = @OL, ovalsafetyrating = @OSR, ovalirating = @OIR, roadlicense = @RL, roadsafetyrating = @RSR, roadirating = @RIR," +
+    " dirtovallicense = @DOL, dirtovalsafetyrating = @DOSR, dirtovalirating = @DOIR, dirtroadlicense = @DRL, dirtroadsafetyrating = @DRSR, dirtroadirating = @DRIR WHERE idMyRatings = 4;",
+    new { OL = ovalRatings.LicenseLevel,
+        OSR = ovalRatings.SafetyRating,
+        OIR = ovalRatings.IRating,
+        RL = roadRatings.LicenseLevel,
+        RSR = roadRatings.SafetyRating,
+        RIR = roadRatings.IRating,
+        DOL = dirtOvalRatings.LicenseLevel,
+        DOSR = dirtOvalRatings.SafetyRating,
+        DOIR = dirtOvalRatings.IRating,
+        DRL = dirtRoadRatings.LicenseLevel,
+        DRSR = dirtRoadRatings.SafetyRating,
+        DRIR = dirtRoadRatings.IRating });
 
 var sessionId = 45243121;
 var subSessionResults = await iRacingClient.GetSubSessionResultAsync(sessionId, true);
@@ -104,9 +111,8 @@ for (var i = 0; i < subSessionResults.Data.SessionResults[1].Results.Length; i++
             carId = results.CarId
         });
 
-    //Console.WriteLine($"{results.DisplayName} {results.FinishPosition + 1} {results.StartingPosition + 1} {results.LapsLead} {results.BestLapNum} {results.BestLapTime} {results.Incidents} {results.OldLicenseLevel} {results.NewLicenseLevel} {results.OldSafetyRating} {results.NewSafetyRating} {results.OldIRating} {results.NewIRating} {results.CarId}");
+    
 }
-
 
 //Password Concealer
 static string ReadPassword()
