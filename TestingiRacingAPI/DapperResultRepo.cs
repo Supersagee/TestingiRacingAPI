@@ -24,6 +24,22 @@ namespace TestingiRacingAPI
         {
             var subSessionResults = await _iRacingClient.GetSubSessionResultAsync(sessionId, true);
 
+            var subResults = subSessionResults.Data;
+
+            _connection.Execute("INSERT INTO subsession (SessionId, SeriesName, StartTime, SeasonShortName, EventTypeName, LicenseCategory, TrackName, StrengthOfField)" +
+                " VALUES (@sessionId, @seriesName, @startTime, @seasonShortName, @eventTypeName, @licenseCategory, @trackName, @strengthOfField);",
+                new
+                {
+                    sessionId = subResults.SubSessionId,
+                    seriesName = subResults.SeriesShortName,
+                    startTime = subResults.StartTime,
+                    seasonShortName = subResults.SeasonShortName,
+                    eventTypeName = subResults.EventTypeName,
+                    licenseCategory = subResults.LicenseCategory,
+                    trackName = subResults.Track.TrackName,
+                    strengthOfField = subResults.EventStrengthOfField
+                });
+
             for (var i = 0; i < subSessionResults.Data.SessionResults[1].Results.Length; i++)
             {
                 var results = subSessionResults.Data.SessionResults[1].Results[i];
@@ -59,16 +75,10 @@ namespace TestingiRacingAPI
             }          
         }
 
-        public async Task<List<int>> ReturnRecentResults()
+        public async Task<List<int>> RecentRacesChecker()
         {
             var recentRaces = await _iRacingClient.GetMemberRecentRacesAsync();
             var recentRacesList = new List<int>();
-            /*var databaseList = new List<int>();
-
-            for (int i = 0; i < 10; i++)
-            {
-                int databaseSessionId;
-            }*/
 
             for (int i = 0; i < recentRaces.Data.Races.Length; i++)
             {
@@ -76,12 +86,12 @@ namespace TestingiRacingAPI
 
                 recentRacesList.Add(getRaces);
             }
-
             return recentRacesList;
         }
 
-        public async Task UpdateMyRatings(int[] myId)
+        public async Task UpdateMyRatings()
         {
+            var myId = new int[1] { 564678 };
             var myRatings = await _iRacingClient.GetDriverInfoAsync(myId, true);
             var ovalRatings = myRatings.Data[0].Licenses[0];
             var roadRatings = myRatings.Data[0].Licenses[1];
