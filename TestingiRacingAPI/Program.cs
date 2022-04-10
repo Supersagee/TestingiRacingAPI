@@ -29,12 +29,6 @@ services.AddIRacingDataApi(options =>
     options.Password = password;
 });
 
-using var provider = services.BuildServiceProvider();
-using var appScope = provider.CreateScope();
-
-var iRacingClient = provider.GetRequiredService<IDataClient>();
-var myInfo = await iRacingClient.GetMyInfoAsync();
-
 var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
@@ -43,19 +37,31 @@ var config = new ConfigurationBuilder()
 string connString = config.GetConnectionString("DefaultConnection");
 IDbConnection conn = new MySqlConnection(connString);
 
-//var repo = new DapperResultRepo(conn, iRacingClient);
+using var provider = services.BuildServiceProvider();
+using var appScope = provider.CreateScope();
 
-Console.WriteLine();
-Console.WriteLine("Request successful!");
-Console.WriteLine($@"Driver name: {myInfo.Data.DisplayName}
-Customer ID: {myInfo.Data.CustomerId}
-Joined iRacing on: {myInfo.Data.MemberSince}
-Suit colors are: {myInfo.Data.Suit.Color1}, {myInfo.Data.Suit.Color2}, {myInfo.Data.Suit.Color3}");
+var iRacingClient = provider.GetRequiredService<IDataClient>();
+var myInfo = await iRacingClient.GetMyInfoAsync();
+
+var repo = new DapperResultRepo(conn, iRacingClient);
+
+var sessionId = 45243121;
+await repo.CreateResult(sessionId);
 
 var myId = new int[1] { 564678 };
+await repo.UpdateMyRatings(myId);
+
+var recentResults = repo.ReturnRecentResults();
+
+foreach (var recentResult in await recentResults)
+{
+    Console.WriteLine(recentResult);
+}
+
+
 //repo.UpdateMyRatings(myId);
 
-var myRatings = await iRacingClient.GetDriverInfoAsync(myId, true);
+/*var myRatings = await iRacingClient.GetDriverInfoAsync(myId, true);
 var ovalRatings = myRatings.Data[0].Licenses[0];
 var roadRatings = myRatings.Data[0].Licenses[1];
 var dirtOvalRatings = myRatings.Data[0].Licenses[2];
@@ -114,7 +120,7 @@ for (var i = 0; i < subSessionResults.Data.SessionResults[1].Results.Length; i++
 
     
 }
-
+*/
 //Password Concealer
 static string ReadPassword()
 {

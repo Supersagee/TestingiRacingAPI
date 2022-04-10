@@ -20,9 +20,9 @@ namespace TestingiRacingAPI
             _iRacingClient = iRacingClient;
         }
 
-        public async void CreateResult(int sessionId, IDataClient iRacingClient)
+        public async Task CreateResult(int sessionId)
         {
-            var subSessionResults = await iRacingClient.GetSubSessionResultAsync(sessionId, true);
+            var subSessionResults = await _iRacingClient.GetSubSessionResultAsync(sessionId, true);
 
             for (var i = 0; i < subSessionResults.Data.SessionResults[1].Results.Length; i++)
             {
@@ -56,10 +56,31 @@ namespace TestingiRacingAPI
                         newIRating = results.NewIRating,
                         carId = results.CarId
                     });
-            }
+            }          
         }
 
-        public async void UpdateMyRatings(int[] myId)
+        public async Task<List<int>> ReturnRecentResults()
+        {
+            var recentRaces = await _iRacingClient.GetMemberRecentRacesAsync();
+            var recentRacesList = new List<int>();
+            /*var databaseList = new List<int>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                int databaseSessionId;
+            }*/
+
+            for (int i = 0; i < recentRaces.Data.Races.Length; i++)
+            {
+                var getRaces = recentRaces.Data.Races[i].SubsessionId;
+
+                recentRacesList.Add(getRaces);
+            }
+
+            return recentRacesList;
+        }
+
+        public async Task UpdateMyRatings(int[] myId)
         {
             var myRatings = await _iRacingClient.GetDriverInfoAsync(myId, true);
             var ovalRatings = myRatings.Data[0].Licenses[0];
