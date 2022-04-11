@@ -1,11 +1,6 @@
 ﻿using Aydsko.iRacingData;
 using Dapper;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestingiRacingAPI
 {
@@ -14,17 +9,43 @@ namespace TestingiRacingAPI
         private readonly IDbConnection _connection;
         private readonly IDataClient _iRacingClient;
 
-        public DapperResultRepo(IDbConnection connection, IDataClient iRacingClient)
+        public DapperResultRepo(IDbConnection mySqlConnection, IDataClient iRacingClient)
         {
-            _connection = connection;
+            _connection = mySqlConnection;
             _iRacingClient = iRacingClient;
+        }
+
+        public async Task CreateQuickResult()
+        {
+            var quickResults = await _iRacingClient.GetMemberRecentRacesAsync();
+
+            var results = quickResults.Data.Races[0];
+
+            _connection.Execute("INSERT INTO quickresults (SessionId, SeriesName, SessionStartTime, WinnerName, StartPosition, Incidents, StrengthOfField, TrackName, CarId, NewiRating)" +
+                " VALUES (@sessionId, @seriesName, @sessionStartTime, @winnerName, @startPosition, @incidents, @strengthOfField, @trackName, @carId, @newiRating);",
+                new
+                {
+                    sessionId = results.SubsessionId,
+                    seriesName = results.SeriesName,
+                    sessionStartTime = results.SessionStartTime,
+                    winnerName = results.WinnerName,
+                    startPosition = results.StartPosition,
+                    incidents = results.Incidents,
+                    strengthOfField = results.StrengthOfField,
+                    trackName = results.Track.TrackName,
+                    carId = results.CarId,
+                    newiRating = results.NewiRating
+                });
         }
 
         public async Task CreateResult(int sessionId)
         {
             var subSessionResults = await _iRacingClient.GetSubSessionResultAsync(sessionId, true);
+            var cars = await _iRacingClient.GetCarsAsync();
 
             var subResults = subSessionResults.Data;
+
+            
 
             _connection.Execute("INSERT INTO subsession (SessionId, SeriesName, StartTime, SeasonShortName, EventTypeName, LicenseCategory, TrackName, StrengthOfField)" +
                 " VALUES (@sessionId, @seriesName, @startTime, @seasonShortName, @eventTypeName, @licenseCategory, @trackName, @strengthOfField);",
@@ -73,6 +94,24 @@ namespace TestingiRacingAPI
                         carId = results.CarId
                     });
             }          
+        }
+
+        public async Task GetCarNames()
+        {
+            var cars = await _iRacingClient.GetCarsAsync();
+
+            for (int i = 0; i < cars.Data.Length; i++)
+            {
+                var carId = cars.Data[i].CarId;
+                var carName = cars.Data[i].CarName;
+
+                _connection.Execute("INSERT INTO cars (CarId, CarName) VALUES (@carId, @carName);",
+                    new
+                    {
+                        carId = carId,
+                        carName = carName
+                    });
+            }
         }
 
         public async Task<List<int>> RecentRacesChecker()

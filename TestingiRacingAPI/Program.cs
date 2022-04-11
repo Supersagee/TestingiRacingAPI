@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using System.Data;
 using MySql.Data.MySqlClient;
 using TestingiRacingAPI;
-using System.IO;
 
 var username = "username";
 var password = "password";
@@ -22,13 +21,15 @@ var config = new ConfigurationBuilder()
                 .Build();
 
 string connString = config.GetConnectionString("DefaultConnection");
-IDbConnection conn = new MySqlConnection(connString);
+IDbConnection mySqlConnection = new MySqlConnection(connString);
 
 using var provider = services.BuildServiceProvider();
 using var appScope = provider.CreateScope();
 var iRacingClient = provider.GetRequiredService<IDataClient>();
 
-var repo = new DapperResultRepo(conn, iRacingClient);
+var repo = new DapperResultRepo(mySqlConnection, iRacingClient);
+
+await repo.UpdateMyRatings();
 
 var resultsList = await repo.RecentRacesChecker();
 
@@ -46,5 +47,3 @@ catch (MySqlException ex)
 {
     
 }
-
-await repo.UpdateMyRatings();
