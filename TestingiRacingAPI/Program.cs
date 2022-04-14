@@ -5,6 +5,14 @@ using System.Data;
 using MySql.Data.MySqlClient;
 using TestingiRacingAPI;
 
+var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+string connString = config.GetConnectionString("DefaultConnection");
+IDbConnection mySqlConnection = new MySqlConnection(connString);
+
 var username = "username";
 var password = "password";
 
@@ -14,14 +22,6 @@ services.AddIRacingDataApi(options =>
     options.Username = username;
     options.Password = password;
 });
-
-var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-string connString = config.GetConnectionString("DefaultConnection");
-IDbConnection mySqlConnection = new MySqlConnection(connString);
 
 using var provider = services.BuildServiceProvider();
 using var appScope = provider.CreateScope();
