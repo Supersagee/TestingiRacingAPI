@@ -10,11 +10,25 @@ namespace TestingiRacingAPI
     {
         public static string ConvertInterval(this int interval)
         {
-            if (interval >= 0 && interval < 600000)
+            if (interval > 0 && interval < 600000)
             {
                 var milliSec = interval % 10000;
                 var second = (interval - milliSec) / 10000;
                 var milliDec = Convert.ToDouble(milliSec * .1);
+
+                if (second < 10)
+                {
+                    if (milliDec < 10)
+                    {
+                        return $"-0{second}.00{Math.Truncate(milliDec)}";
+                    }
+
+                    if (milliDec < 100)
+                    {
+                        return $"-0{second}.0{Math.Truncate(milliDec)}";
+                    }
+                    return $"-0{second}.{Math.Truncate(milliDec)}";
+                }
                 if (milliDec < 10)
                 {
                     return $"-{second}.00{Math.Truncate(milliDec)}";
@@ -23,11 +37,6 @@ namespace TestingiRacingAPI
                 if (milliDec < 100)
                 {
                     return $"-{second}.0{Math.Truncate(milliDec)}";
-                }
-
-                if (second < 10)
-                {
-                    return $"-0{second}.{Math.Truncate(milliDec)}";
                 }
                 return $"-{second}.{Math.Truncate(milliDec)}";
             }
@@ -42,7 +51,25 @@ namespace TestingiRacingAPI
 
                 if (second < 10)
                 {
+                    if (milliDec < 10)
+                    {
+                        return $"-{minute}:0{second}.00{Math.Truncate(milliDec)}";
+                    }
+
+                    if (milliDec < 100)
+                    {
+                        return $"-{minute}:0{second}.0{Math.Truncate(milliDec)}";
+                    }
                     return $"-{minute}:0{second}.{Math.Truncate(milliDec)}";
+                }
+                if (milliDec < 10)
+                {
+                    return $"-{minute}:{second}.00{Math.Truncate(milliDec)}";
+                }
+
+                if (milliDec < 100)
+                {
+                    return $"-{minute}:{second}.0{Math.Truncate(milliDec)}";
                 }
                 return $"-{minute}:{second}.{Math.Truncate(milliDec)}";
             }
@@ -59,9 +86,28 @@ namespace TestingiRacingAPI
                 second = second - (minute * 60);
                 var milliDec = Convert.ToDouble(milliSec * .1);
 
+
                 if (second < 10)
                 {
+                    if (milliDec < 10)
+                    {
+                        return $"-{minute}:0{second}.00{Math.Truncate(milliDec)}";
+                    }
+
+                    if (milliDec < 100)
+                    {
+                        return $"-{minute}:0{second}.0{Math.Truncate(milliDec)}";
+                    }
                     return $"{minute}:0{second}.{Math.Truncate(milliDec)}";
+                }
+                if (milliDec < 10)
+                {
+                    return $"-{minute}:{second}.00{Math.Truncate(milliDec)}";
+                }
+
+                if (milliDec < 100)
+                {
+                    return $"-{minute}:{second}.0{Math.Truncate(milliDec)}";
                 }
                 return $"{minute}:{second}.{Math.Truncate(milliDec)}";
             }

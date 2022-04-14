@@ -13,8 +13,8 @@ var config = new ConfigurationBuilder()
 string connString = config.GetConnectionString("DefaultConnection");
 IDbConnection mySqlConnection = new MySqlConnection(connString);
 
-var username = "username";
-var password = "password";
+var username = "williamdsage@gmail.com";
+var password = "HunterSage22";
 
 var services = new ServiceCollection();
 services.AddIRacingDataApi(options =>
