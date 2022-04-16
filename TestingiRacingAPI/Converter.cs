@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TestingiRacingAPI
+﻿namespace TestingiRacingAPI
 {
     public static class Converter
     {
@@ -93,6 +87,36 @@ namespace TestingiRacingAPI
                 return "-";
             }
             return lapNum.ToString();
+        }
+
+        public static string ConvertLicense(this int licenseId)
+        {
+            switch (licenseId)
+            {
+                case < 5:
+                    return "R";
+
+                case < 9:
+                    return "D";
+
+                case < 13:
+                    return "C";
+
+                case < 17:
+                    return "B";
+
+                case < 21:
+                    return "A";
+
+                case < 25:
+                    return "Pro";
+
+                case < 29: 
+                    return "PWC";
+
+                default:
+                    return "N/A";
+            }
         }
     }
 }

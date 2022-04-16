@@ -65,9 +65,9 @@ namespace TestingiRacingAPI
             {
                 var results = subSessionResults.Data.SessionResults[1].Results[i];
 
-                _connection.Execute("INSERT INTO results (SessionId, CustId, DisplayName, CarNumber, FinishPosition, StartingPosition, FinishInterval, LapsLed, BestLapNum, BestLapTime, AverageLap," +
+                _connection.Execute("INSERT INTO results (SessionId, CustId, DisplayName, CarNumber, FinishPosition, StartingPosition, FinishInterval, LapsLed, LapsComplete, BestLapNum, BestLapTime, AverageLap," +
                     " Incidents, Division, ClubShortname, OldLicenseLevel, NewLicenseLevel, OldSafetyRating, NewSafetyRating, OldIRating, NewIRating, CarId)" +
-                    " VALUES (@sessionId, @custId, @displayName, @carNumber, @finishPosition, @startingPosition, @finishInterval, @lapsLed, @bestLapNum, @bestLapTime," +
+                    " VALUES (@sessionId, @custId, @displayName, @carNumber, @finishPosition, @startingPosition, @finishInterval, @lapsLed, @lapsComplete, @bestLapNum, @bestLapTime," +
                     " @averageLap, @incidents, @division, @clubshortname, @oldLicenseLevel, @newLicenseLevel, @oldSafetyRating, @newSafetyRating, @oldIRating, @newIRating, @carId);",
                     new
                     {
@@ -79,14 +79,15 @@ namespace TestingiRacingAPI
                         startingPosition = results.StartingPosition + 1,
                         finishInterval = results.Interval.ConvertInterval(),
                         lapsLed = results.LapsLead,
+                        lapsComplete = results.LapsComplete,
                         bestLapNum = results.BestLapNum.ConvertBestLapNum(),
                         bestLapTime = results.BestLapTime.ConvertLapTime(),
                         averageLap = results.AverageLap.ConvertLapTime(),
                         incidents = results.Incidents,
                         division = results.Division + 1,
                         clubshortname = results.ClubShortname,
-                        oldLicenseLevel = results.OldLicenseLevel,
-                        newLicenseLevel = results.NewLicenseLevel,
+                        oldLicenseLevel = results.OldLicenseLevel.ConvertLicense(),
+                        newLicenseLevel = results.NewLicenseLevel.ConvertLicense(),
                         oldSafetyRating = results.OldSafetyRating,
                         newSafetyRating = results.NewSafetyRating,
                         oldIRating = results.OldIRating,
