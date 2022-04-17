@@ -1,4 +1,4 @@
-﻿using Aydsko.iRacingData;
+using Aydsko.iRacingData;
 using Dapper;
 using System.Data;
 

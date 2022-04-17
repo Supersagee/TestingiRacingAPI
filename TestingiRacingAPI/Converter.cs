@@ -1,4 +1,4 @@
-﻿namespace TestingiRacingAPI
+namespace TestingiRacingAPI
 {
     public static class Converter
     {
