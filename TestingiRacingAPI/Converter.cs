@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-﻿namespace TestingiRacingAPI
-=======
 namespace TestingiRacingAPI
->>>>>>> 35e3e3b3fc68e165c4bca54ac077287f6725c578
+
 {
     public static class Converter
     {
@@ -115,11 +112,7 @@ namespace TestingiRacingAPI
                 case < 25:
                     return "Pro";
 
-<<<<<<< HEAD
                 case < 29:
-=======
-                case < 29: 
->>>>>>> 35e3e3b3fc68e165c4bca54ac077287f6725c578
                     return "PWC";
 
                 default:
