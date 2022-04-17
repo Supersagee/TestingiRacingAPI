@@ -38,6 +38,16 @@ namespace TestingiRacingAPI
                 });
         }
 
+        public async Task WriteQuickResult(int sessionId)
+        {
+            var subSessionResults = await _iRacingClient.GetSubSessionResultAsync(sessionId, true);
+
+            for (int i = 0; i < subSessionResults.Data.SessionResults.Length; i++)
+            {
+                Console.WriteLine($"{subSessionResults.Data.SubSessionId} -- {subSessionResults.Data.SessionId} -- ");
+            }
+        }
+
         public async Task CreateResult(int sessionId)
         {
             var subSessionResults = await _iRacingClient.GetSubSessionResultAsync(sessionId, true);
@@ -45,7 +55,7 @@ namespace TestingiRacingAPI
 
             var subResults = subSessionResults.Data;
 
-            
+
 
             _connection.Execute("INSERT INTO subsession (SessionId, SeriesName, StartTime, SeasonShortName, EventTypeName, LicenseCategory, TrackName, StrengthOfField)" +
                 " VALUES (@sessionId, @seriesName, @startTime, @seasonShortName, @eventTypeName, @licenseCategory, @trackName, @strengthOfField);",
@@ -61,13 +71,13 @@ namespace TestingiRacingAPI
                     strengthOfField = subResults.EventStrengthOfField
                 });
 
-            for (var i = 0; i < subSessionResults.Data.SessionResults[1].Results.Length; i++)
+            for (var i = 0; i < subSessionResults.Data.SessionResults[^1].Results.Length; i++)
             {
-                var results = subSessionResults.Data.SessionResults[1].Results[i];
+                var results = subSessionResults.Data.SessionResults[^1].Results[i];
 
-                _connection.Execute("INSERT INTO results (SessionId, CustId, DisplayName, CarNumber, FinishPosition, StartingPosition, FinishInterval, LapsLed, BestLapNum, BestLapTime, AverageLap," +
+                _connection.Execute("INSERT INTO results (SessionId, CustId, DisplayName, CarNumber, FinishPosition, ClassPosition, StartingPosition, FinishInterval, LapsLed, LapsComplete, BestLapNum, BestLapTime, AverageLap," +
                     " Incidents, Division, ClubShortname, OldLicenseLevel, NewLicenseLevel, OldSafetyRating, NewSafetyRating, OldIRating, NewIRating, CarId)" +
-                    " VALUES (@sessionId, @custId, @displayName, @carNumber, @finishPosition, @startingPosition, @finishInterval, @lapsLed, @bestLapNum, @bestLapTime," +
+                    " VALUES (@sessionId, @custId, @displayName, @carNumber, @finishPosition, @classPosition, @startingPosition, @finishInterval, @lapsLed, @lapsComplete, @bestLapNum, @bestLapTime," +
                     " @averageLap, @incidents, @division, @clubshortname, @oldLicenseLevel, @newLicenseLevel, @oldSafetyRating, @newSafetyRating, @oldIRating, @newIRating, @carId);",
                     new
                     {
@@ -76,24 +86,26 @@ namespace TestingiRacingAPI
                         displayName = results.DisplayName,
                         carNumber = results.Livery.CarNumber,
                         finishPosition = results.FinishPosition + 1,
+                        classPosition = results.FinishPositionInClass + 1,
                         startingPosition = results.StartingPosition + 1,
                         finishInterval = results.Interval.ConvertInterval(),
                         lapsLed = results.LapsLead,
+                        lapsComplete = results.LapsComplete,
                         bestLapNum = results.BestLapNum.ConvertBestLapNum(),
                         bestLapTime = results.BestLapTime.ConvertLapTime(),
                         averageLap = results.AverageLap.ConvertLapTime(),
                         incidents = results.Incidents,
                         division = results.Division + 1,
                         clubshortname = results.ClubShortname,
-                        oldLicenseLevel = results.OldLicenseLevel,
-                        newLicenseLevel = results.NewLicenseLevel,
+                        oldLicenseLevel = results.OldLicenseLevel.ConvertLicense(),
+                        newLicenseLevel = results.NewLicenseLevel.ConvertLicense(),
                         oldSafetyRating = results.OldSafetyRating,
                         newSafetyRating = results.NewSafetyRating,
                         oldIRating = results.OldIRating,
                         newIRating = results.NewIRating,
                         carId = results.CarId
                     });
-            }          
+            }
         }
 
         public async Task GetCarNames()
@@ -138,19 +150,19 @@ namespace TestingiRacingAPI
             var dirtRoadRatings = myRatings.Data[0].Licenses[3];
 
             _connection.Execute("UPDATE myratings SET ovallicense = @OL, ovalsafetyrating = @OSR, ovalirating = @OIR, roadlicense = @RL, roadsafetyrating = @RSR, roadirating = @RIR," +
-                " dirtovallicense = @DOL, dirtovalsafetyrating = @DOSR, dirtovalirating = @DOIR, dirtroadlicense = @DRL, dirtroadsafetyrating = @DRSR, dirtroadirating = @DRIR WHERE idMyRatings = 4;",
+                " dirtovallicense = @DOL, dirtovalsafetyrating = @DOSR, dirtovalirating = @DOIR, dirtroadlicense = @DRL, dirtroadsafetyrating = @DRSR, dirtroadirating = @DRIR WHERE idMyRatings = 1;",
                 new
                 {
-                    OL = ovalRatings.LicenseLevel,
+                    OL = ovalRatings.LicenseLevel.ConvertLicense(),
                     OSR = ovalRatings.SafetyRating,
                     OIR = ovalRatings.IRating,
-                    RL = roadRatings.LicenseLevel,
+                    RL = roadRatings.LicenseLevel.ConvertLicense(),
                     RSR = roadRatings.SafetyRating,
                     RIR = roadRatings.IRating,
-                    DOL = dirtOvalRatings.LicenseLevel,
+                    DOL = dirtOvalRatings.LicenseLevel.ConvertLicense(),
                     DOSR = dirtOvalRatings.SafetyRating,
                     DOIR = dirtOvalRatings.IRating,
-                    DRL = dirtRoadRatings.LicenseLevel,
+                    DRL = dirtRoadRatings.LicenseLevel.ConvertLicense(),
                     DRSR = dirtRoadRatings.SafetyRating,
                     DRIR = dirtRoadRatings.IRating
                 });
