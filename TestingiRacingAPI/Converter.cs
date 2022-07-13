@@ -3,83 +3,41 @@ namespace TestingiRacingAPI
 {
     public static class Converter
     {
-        public static string ConvertInterval(this int interval)
+        public static string ConvertInterval(this TimeSpan? time)
         {
-            if (interval > 0)
+            var format = @"mm\:ss\.fff";
+
+            if (time.HasValue)
             {
-                var milliSec = interval % 10000;
-                var second = (interval - milliSec) / 10000;
-                var minute = second / 60;
-                second = second - (minute * 60);
-                var milliDec = Math.Truncate(Convert.ToDouble(milliSec * .1));
-
-                if (second < 10)
+                if (time < TimeSpan.Zero)
                 {
-                    if (milliDec < 10)
-                    {
-                        return $"-{minute}:0{second}.00{milliDec}";
-                    }
-
-                    if (milliDec < 100)
-                    {
-                        return $"-{minute}:0{second}.0{milliDec}";
-                    }
-                    return $"-{minute}:0{second}.{milliDec}";
+                    return "-";
                 }
-
-                if (milliDec < 10)
-                {
-                    return $"-{minute}:{second}.00{milliDec}";
-                }
-
-                if (milliDec < 100)
-                {
-                    return $"-{minute}:{second}.0{milliDec}";
-                }
-                return $"-{minute}:{second}.{milliDec}";
+                
+                TimeSpan convertedTime = time.Value;
+                return $"-{convertedTime.ToString(format)}";
             }
 
             return "-";
         }
 
-        public static string ConvertLapTime(this int lapTime)
+        public static string ConvertLapTime(this TimeSpan? time)
         {
-            if (lapTime > 0)
+            var format = @"mm\:ss\.fff";
+            
+            if (time.HasValue)
             {
-                var milliSec = lapTime % 10000;
-                var second = (lapTime - milliSec) / 10000;
-                var minute = second / 60;
-                second = second - (minute * 60);
-                var milliDec = Math.Truncate(Convert.ToDouble(milliSec * .1));
-
-                if (second < 10)
+                if (time < TimeSpan.Zero)
                 {
-                    if (milliDec < 10)
-                    {
-                        return $"{minute}:0{second}.00{milliDec}";
-                    }
-
-                    if (milliDec < 100)
-                    {
-                        return $"{minute}:0{second}.0{milliDec}";
-                    }
-                    return $"{minute}:0{second}.{milliDec}";
+                    return "-";
                 }
 
-                if (milliDec < 10)
-                {
-                    return $"{minute}:{second}.00{milliDec}";
-                }
-
-                if (milliDec < 100)
-                {
-                    return $"{minute}:{second}.0{milliDec}";
-                }
-                return $"{minute}:{second}.{milliDec}";
+                TimeSpan convertedTime = time.Value;
+                return convertedTime.ToString(format);
             }
 
-            return "-";
-        }
+            return "-";          
+        }             
 
         public static string ConvertBestLapNum(this int lapNum)
         {

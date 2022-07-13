@@ -10,7 +10,7 @@ var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-string connString = config.GetConnectionString("DefaultConnection");
+string connString = config.GetConnectionString("AzureConnection");
 IDbConnection mySqlConnection = new MySqlConnection(connString);
 
 var username = "";
@@ -30,6 +30,8 @@ var iRacingClient = provider.GetRequiredService<IDataClient>();
 var repo = new DapperResultRepo(mySqlConnection, iRacingClient);
 
 await repo.UpdateMyRatings();
+
+//await repo.GetCarNames();
 
 var resultsList = await repo.RecentRacesChecker();
 

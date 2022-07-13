@@ -55,15 +55,13 @@ namespace TestingiRacingAPI
 
             var subResults = subSessionResults.Data;
 
-
-
             _connection.Execute("INSERT INTO subsession (SessionId, SeriesName, StartTime, SeasonShortName, EventTypeName, LicenseCategory, TrackName, StrengthOfField)" +
                 " VALUES (@sessionId, @seriesName, @startTime, @seasonShortName, @eventTypeName, @licenseCategory, @trackName, @strengthOfField);",
                 new
                 {
                     sessionId = subResults.SubSessionId,
                     seriesName = subResults.SeriesShortName,
-                    startTime = subResults.StartTime,
+                    startTime = subResults.StartTime.DateTime.ToLocalTime(),
                     seasonShortName = subResults.SeasonShortName,
                     eventTypeName = subResults.EventTypeName,
                     licenseCategory = subResults.LicenseCategory,
@@ -82,7 +80,7 @@ namespace TestingiRacingAPI
                     new
                     {
                         sessionId = sessionId,
-                        custId = results.CustId,
+                        custId = results.CustomerId,
                         displayName = results.DisplayName,
                         carNumber = results.Livery.CarNumber,
                         finishPosition = results.FinishPosition + 1,
@@ -91,7 +89,7 @@ namespace TestingiRacingAPI
                         finishInterval = results.Interval.ConvertInterval(),
                         lapsLed = results.LapsLead,
                         lapsComplete = results.LapsComplete,
-                        bestLapNum = results.BestLapNum.ConvertBestLapNum(),
+                        bestLapNum = results.BestLapNumber.ConvertBestLapNum(),
                         bestLapTime = results.BestLapTime.ConvertLapTime(),
                         averageLap = results.AverageLap.ConvertLapTime(),
                         incidents = results.Incidents,
@@ -120,8 +118,8 @@ namespace TestingiRacingAPI
                 _connection.Execute("INSERT INTO cars (CarId, CarName) VALUES (@carId, @carName);",
                     new
                     {
-                        carId = carId,
-                        carName = carName
+                        carId,
+                        carName
                     });
             }
         }
